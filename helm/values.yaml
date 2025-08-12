@@ -1,5 +1,5 @@
 # Default values for demo-app
-replicaCount: 3
+replicaCount: 1
 
 image:
   repository: nginx
