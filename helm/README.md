@@ -115,11 +115,13 @@ The application exposes metrics and logs that can be collected by:
 
 ## Security Features
 
-- Non-root user execution
-- Read-only root filesystem
+- Non-root user execution (UID 1000)
+- Read-only root filesystem with writable volumes for cache/tmp
+- Container runs on port 8080 (non-privileged port) for enhanced security
 - Security contexts applied
 - Resource limits enforced
 - Network policies ready (add as needed)
+- Custom nginx configuration via ConfigMap
 
 ## Troubleshooting
 
@@ -136,4 +138,3 @@ kubectl logs -l app.kubernetes.io/name=demo-app -f
 Describe deployment:
 ```bash
 kubectl describe deployment demo-app
-```

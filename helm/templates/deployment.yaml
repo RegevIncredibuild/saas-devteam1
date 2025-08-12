@@ -35,17 +35,17 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8080
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /health
               port: http
             initialDelaySeconds: 30
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /
+              path: /health
               port: http
             initialDelaySeconds: 5
             periodSeconds: 5
@@ -65,6 +65,10 @@ spec:
               mountPath: /var/cache/nginx
             - name: var-run
               mountPath: /var/run
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+              readOnly: true
       volumes:
         - name: tmp-volume
           emptyDir: {}
@@ -72,6 +76,9 @@ spec:
           emptyDir: {}
         - name: var-run
           emptyDir: {}
+        - name: nginx-config
+          configMap:
+            name: {{ include "demo-app.fullname" . }}-nginx-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

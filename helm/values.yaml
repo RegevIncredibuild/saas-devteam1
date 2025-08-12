@@ -30,7 +30,8 @@ securityContext:
 
 service:
   type: ClusterIP
-  port: 80
+  port: 80  # External service port (can remain 80)
+  # Note: Container runs on port 8080 for non-root security
 
 ingress:
   enabled: false
