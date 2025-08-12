@@ -1,0 +1,14 @@
+apiVersion: v2
+name: demo-app
+description: A basic demo application for ArgoCD deployment
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - demo
+  - web
+  - argocd
+home: https://github.com/RegevIncredibuild/saas-devteam1
+maintainers:
+  - name: DevTeam
+    email: devteam@incredibuild.com

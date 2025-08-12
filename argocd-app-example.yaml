@@ -1,0 +1,57 @@
+# ArgoCD Application for Demo App
+#
+# This application deploys the demo-app Helm chart via ArgoCD GitOps
+# 
+# To deploy:
+# 1. Update the repoURL to match your actual repository
+# 2. Apply this file to your ArgoCD cluster:
+#    kubectl apply -f argocd-app-example.yaml
+#
+# The application will be deployed by ArgoCD under the 'default' project
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-app
+  namespace: argocd  # ArgoCD control plane namespace
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io  # Ensures proper cleanup of managed resources when app is deleted
+spec:
+  project: devteam1  # ArgoCD project - 'default' allows deployment to any cluster/namespace
+  
+  # SOURCE: Where to find the Helm chart
+  source:
+    repoURL: https://github.com/RegevIncredibuild/saas-devteam1.git  # Update this to your actual repo URL
+    targetRevision: HEAD  # Always deploy from latest commit on default branch
+    path: helm  # Directory containing the Helm chart
+    helm:
+      # Optional: Override values
+      valueFiles:
+        - values.yaml
+      # Optional: Set specific values
+      values: |
+        replicaCount: 2
+        app:
+          environment: development
+        ingress:
+          enabled: false
+  
+  # DESTINATION: Where to deploy the application resources
+  destination:
+    server: https://kubernetes.default.svc  # Deploy to same cluster as ArgoCD control plane
+    namespace: devteam1-demo-app-ns  # Target namespace for application resources
+  
+  # SYNC POLICY: How ArgoCD manages the application lifecycle
+  syncPolicy:
+    automated:
+      prune: true      # Delete resources removed from Git (GitOps cleanup)
+      selfHeal: true   # Auto-sync when cluster state drifts from Git state
+    syncOptions:
+      - CreateNamespace=true  # Create target namespace if it doesn't exist
+      - Replace=false         # Use kubectl apply instead of replace for updates
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
